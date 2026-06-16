@@ -1,0 +1,194 @@
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+  <style>
+    @page {
+      size: A4 portrait;
+      margin: 2cm 2.5cm;
+    }
+    body {
+      font-family: 'DejaVuSans', sans-serif;
+      font-size: 10pt;
+      color: #333333;
+      line-height: 1.4;
+    }
+    h1 {
+      font-size: 22pt;
+      margin: 0 0 6pt 0;
+      color: #1a1a1a;
+    }
+    h2 {
+      font-size: 10pt;
+      text-transform: uppercase;
+      letter-spacing: 1pt;
+      color: #2c5282;
+      margin: 14pt 0 4pt 0;
+      border-bottom: 0.5pt solid #2c5282;
+      padding-bottom: 2pt;
+    }
+    hr.divider {
+      border: none;
+      border-top: 0.5pt solid #cccccc;
+      margin: 6pt 0;
+    }
+    p {
+      margin: 3pt 0;
+    }
+    .contact {
+      font-size: 9pt;
+      color: #555555;
+      margin: 2pt 0;
+    }
+    .section {
+      margin-bottom: 10pt;
+    }
+    .entry {
+      margin-bottom: 8pt;
+      page-break-inside: avoid;
+    }
+    .entry-table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+    .entry-table td {
+      vertical-align: top;
+      padding: 0;
+    }
+    .col-right {
+      text-align: right;
+      white-space: nowrap;
+      font-size: 9pt;
+      color: #555555;
+    }
+    .job-title {
+      font-weight: bold;
+      color: #1a1a1a;
+    }
+    .degree {
+      font-weight: bold;
+      color: #1a1a1a;
+    }
+    .company {
+      font-size: 9.5pt;
+      color: #444444;
+    }
+    .institution {
+      font-size: 9.5pt;
+      color: #444444;
+    }
+    .description {
+      margin: 4pt 0 0 0;
+      font-size: 9.5pt;
+    }
+    .skills-list {
+      margin: 4pt 0;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <div class="header">
+    <h1 th:text="${resume.fullName}">Full Name</h1>
+    <p class="contact">
+      <span th:text="${resume.email}">email@example.com</span>
+      <span th:if="${not #strings.isEmpty(resume.phone)}">
+        <span> · </span><span th:text="${resume.phone}">+1 555 0001</span>
+      </span>
+      <span th:if="${not #strings.isEmpty(resume.location)}">
+        <span> · </span><span th:text="${resume.location}">City, Country</span>
+      </span>
+    </p>
+    <p class="contact"
+       th:if="${not #strings.isEmpty(resume.linkedInUrl) or not #strings.isEmpty(resume.githubUrl)}">
+      <span th:if="${not #strings.isEmpty(resume.linkedInUrl)}"
+            th:text="${resume.linkedInUrl}">linkedin.com/in/you</span>
+      <span th:if="${not #strings.isEmpty(resume.linkedInUrl) and not #strings.isEmpty(resume.githubUrl)}"> · </span>
+      <span th:if="${not #strings.isEmpty(resume.githubUrl)}"
+            th:text="${resume.githubUrl}">github.com/you</span>
+    </p>
+  </div>
+
+  <hr class="divider"/>
+
+  <!-- SUMMARY -->
+  <div class="section" th:if="${not #strings.isEmpty(resume.summary)}">
+    <h2>Summary</h2>
+    <p th:text="${resume.summary}">Professional summary.</p>
+  </div>
+
+  <!-- WORK EXPERIENCE -->
+  <div class="section" th:if="${not #lists.isEmpty(resume.workExperiences)}">
+    <h2>Work Experience</h2>
+    <div class="entry" th:each="we : ${resume.workExperiences}">
+      <table class="entry-table">
+        <tr>
+          <td>
+            <span class="job-title" th:text="${we.title}">Job Title</span>
+          </td>
+          <td class="col-right">
+            <span th:text="${#temporals.format(we.startDate, 'MMM yyyy')}">Jan 2020</span>
+            <span> &#x2013; </span>
+            <span th:if="${we.endDate != null}"
+                  th:text="${#temporals.format(we.endDate, 'MMM yyyy')}">Dec 2023</span>
+            <span th:unless="${we.endDate != null}">Present</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="company" th:text="${we.company}">Company Name</span>
+            <span th:if="${not #strings.isEmpty(we.location)}" class="company">
+              <span> · </span><span th:text="${we.location}">City</span>
+            </span>
+          </td>
+          <td/>
+        </tr>
+      </table>
+      <p class="description"
+         th:if="${not #strings.isEmpty(we.description)}"
+         th:text="${we.description}">Role description.</p>
+    </div>
+  </div>
+
+  <!-- EDUCATION -->
+  <div class="section" th:if="${not #lists.isEmpty(resume.educations)}">
+    <h2>Education</h2>
+    <div class="entry" th:each="edu : ${resume.educations}">
+      <table class="entry-table">
+        <tr>
+          <td>
+            <span class="degree" th:text="${edu.degree}">Degree</span>
+            <span th:if="${not #strings.isEmpty(edu.fieldOfStudy)}">
+              <span> &#x2013; </span><span th:text="${edu.fieldOfStudy}">Field of Study</span>
+            </span>
+          </td>
+          <td class="col-right">
+            <span th:text="${#temporals.format(edu.startDate, 'MMM yyyy')}">Sep 2016</span>
+            <span> &#x2013; </span>
+            <span th:if="${edu.endDate != null}"
+                  th:text="${#temporals.format(edu.endDate, 'MMM yyyy')}">Jun 2020</span>
+            <span th:unless="${edu.endDate != null}">Present</span>
+          </td>
+        </tr>
+        <tr>
+          <td>
+            <span class="institution" th:text="${edu.institution}">University Name</span>
+          </td>
+          <td/>
+        </tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- SKILLS -->
+  <div class="section" th:if="${not #lists.isEmpty(resume.skills)}">
+    <h2>Skills</h2>
+    <p class="skills-list">
+      <span th:each="skill,iter : ${resume.skills}">
+        <span th:text="${skill}">Skill</span><span th:unless="${iter.last}">, </span>
+      </span>
+    </p>
+  </div>
+
+</body>
+</html>
