@@ -51,6 +51,12 @@ public class Resume {
     @ToString.Exclude
     private List<Education> educations = new ArrayList<>();
 
+    // optional = true matches the nullable user_id column (legacy ownerless rows)
+    @ManyToOne(fetch = FetchType.LAZY, optional = true)
+    @JoinColumn(name = "user_id")
+    @ToString.Exclude
+    private User user;
+
     private LocalDateTime createdAt;
     private LocalDateTime updatedAt;
 

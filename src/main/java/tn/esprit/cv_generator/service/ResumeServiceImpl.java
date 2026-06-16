@@ -6,10 +6,10 @@ import tn.esprit.cv_generator.dto.ResumeRequest;
 import tn.esprit.cv_generator.dto.ResumeResponse;
 import tn.esprit.cv_generator.entity.Education;
 import tn.esprit.cv_generator.entity.Resume;
+import tn.esprit.cv_generator.entity.User;
 import tn.esprit.cv_generator.entity.WorkExperience;
-import tn.esprit.cv_generator.repository.ResumeRepository;
-
 import tn.esprit.cv_generator.exception.ResourceNotFoundException;
+import tn.esprit.cv_generator.repository.ResumeRepository;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,34 +21,37 @@ public class ResumeServiceImpl implements ResumeService {
     private final ResumeRepository resumeRepository;
 
     @Override
-    public ResumeResponse create(ResumeRequest request) {
+    public ResumeResponse create(ResumeRequest request, User user) {
         Resume resume = toEntity(request);
+        resume.setUser(user);
         return toResponse(resumeRepository.save(resume));
     }
 
     @Override
-    public ResumeResponse findById(Long id) {
-        return resumeRepository.findById(id)
+    public ResumeResponse findByIdAndUser(Long id, User user) {
+        return resumeRepository.findByIdAndUser(id, user)
                 .map(this::toResponse)
                 .orElseThrow(() -> new ResourceNotFoundException("Resume not found: " + id));
     }
 
     @Override
-    public List<ResumeResponse> findAll() {
-        return resumeRepository.findAll().stream().map(this::toResponse).toList();
+    public List<ResumeResponse> findAllByUser(User user) {
+        return resumeRepository.findAllByUser(user).stream().map(this::toResponse).toList();
     }
 
     @Override
-    public ResumeResponse update(Long id, ResumeRequest request) {
-        Resume resume = resumeRepository.findById(id)
+    public ResumeResponse update(Long id, ResumeRequest request, User user) {
+        Resume resume = resumeRepository.findByIdAndUser(id, user)
                 .orElseThrow(() -> new ResourceNotFoundException("Resume not found: " + id));
         applyRequest(resume, request);
         return toResponse(resumeRepository.save(resume));
     }
 
     @Override
-    public void delete(Long id) {
-        resumeRepository.deleteById(id);
+    public void delete(Long id, User user) {
+        Resume resume = resumeRepository.findByIdAndUser(id, user)
+                .orElseThrow(() -> new ResourceNotFoundException("Resume not found: " + id));
+        resumeRepository.delete(resume);
     }
 
     private Resume toEntity(ResumeRequest req) {
