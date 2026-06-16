@@ -1,0 +1,44 @@
+<div class="page">
+  <div class="page-header">
+    <h1>Résumés</h1>
+    <a routerLink="/resumes/new" class="btn btn-primary">+ New Résumé</a>
+  </div>
+
+  <div *ngIf="error" class="alert alert-error">
+    {{ error }}
+    <button class="alert-close" (click)="error = ''">×</button>
+  </div>
+
+  <div *ngIf="loading" class="loading">Loading…</div>
+
+  <table *ngIf="!loading && resumes.length > 0" class="table">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Email</th>
+        <th>Last updated</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr *ngFor="let r of resumes">
+        <td><strong>{{ r.fullName }}</strong></td>
+        <td>{{ r.email }}</td>
+        <td>{{ r.updatedAt | date:'dd MMM yyyy, HH:mm' }}</td>
+        <td>
+          <div class="td-actions">
+            <a [routerLink]="['/resumes', r.id, 'edit']" class="btn btn-sm">Edit</a>
+            <button class="btn btn-sm" (click)="downloadPdf(r.id)">PDF</button>
+            <button class="btn btn-sm" (click)="preview(r.id)">Preview</button>
+            <button class="btn btn-sm btn-danger" (click)="delete(r.id)">Delete</button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+
+  <div *ngIf="!loading && resumes.length === 0" class="empty-state">
+    <p>No résumés yet.</p>
+    <a routerLink="/resumes/new">Create your first one →</a>
+  </div>
+</div>
