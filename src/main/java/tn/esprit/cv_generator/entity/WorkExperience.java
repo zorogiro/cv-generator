@@ -21,9 +21,12 @@ public class WorkExperience {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private String company;
+    @Column(nullable = false)
     private String title;
     private String location;
+    @Column(nullable = false)
     private LocalDate startDate;
     private LocalDate endDate; // null = current position
 

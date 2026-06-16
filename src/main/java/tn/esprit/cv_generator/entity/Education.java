@@ -21,9 +21,12 @@ public class Education {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private String institution;
+    @Column(nullable = false)
     private String degree;
     private String fieldOfStudy;
+    @Column(nullable = false)
     private LocalDate startDate;
     private LocalDate endDate;
 

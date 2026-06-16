@@ -10,7 +10,7 @@ A Spring Boot 3.5 REST API that manages résumés and exports them as styled A4 
 | --- | --- | --- |
 | Runtime | Java | 17 |
 | Framework | Spring Boot | 3.5.15 |
-| Persistence | Spring Data JPA + H2 (in-memory) | managed by Boot |
+| Persistence | Spring Data JPA + PostgreSQL + Flyway | managed by Boot |
 | Validation | Jakarta Bean Validation 3 | managed by Boot |
 | PDF export | Thymeleaf 3 + OpenHTMLtoPDF + PDFBox | OpenHTMLtoPDF 1.0.10 |
 | AI integration | Spring AI + Anthropic Claude | Spring AI BOM 1.0.0 |
@@ -20,36 +20,58 @@ A Spring Boot 3.5 REST API that manages résumés and exports them as styled A4 
 
 ## Prerequisites
 
-- **JDK 17** or later — the only required install. Maven is not required; all commands below use the `mvnw` wrapper included in the repo.
+- **JDK 17** or later
+- **Docker** (for the PostgreSQL container) — Maven is not required; all commands use the `mvnw` wrapper included in the repo.
 
 ---
 
 ## Running the app
 
+### 1. Start PostgreSQL
+
+A `docker-compose.yml` is included. The container uses the same credentials that `application.properties` defaults to, so **no environment variables are needed for local development**:
+
 ```bash
-./mvnw spring-boot:run          # Linux / macOS
-mvnw.cmd spring-boot:run        # Windows
+docker compose up -d
+```
+
+Data is stored in a named Docker volume (`pgdata`) and **persists across container restarts**. To wipe the database: `docker compose down -v`.
+
+### 2. Run the backend
+
+```bash
+mvnw.cmd spring-boot:run   # Windows
+./mvnw spring-boot:run     # Linux / macOS
+
+# or via Make
+make backend-run
+```
+
+On first start Flyway runs `V1__init.sql` automatically and creates all tables. You will see a log line like:
+
+```text
+Flyway Community Edition ... by Redgate
+Successfully applied 1 migration to schema "public"
 ```
 
 The server starts on **<http://localhost:8080>**.
 
-### H2 web console
+### Environment variables
 
-The in-memory database is accessible at **<http://localhost:8080/h2-console>** while the app is running.
+| Variable | Default | Purpose |
+| --- | --- | --- |
+| `DB_URL` | `jdbc:postgresql://localhost:5432/cvdb` | JDBC URL |
+| `DB_USER` | `postgres` | Database username |
+| `DB_PASSWORD` | `postgres` | Database password |
+| `ANTHROPIC_API_KEY` | *(unset — stub mode)* | Anthropic Claude API key |
 
-| Field | Value |
-| --- | --- |
-| JDBC URL | `jdbc:h2:mem:cvdb` |
-| User name | `sa` |
-| Password | *(leave blank)* |
-
-> Data is lost when the app stops (`ddl-auto=create-drop`).
+Override any variable in the same terminal session that starts the app — never commit credentials to source files.
 
 ---
 
 ## AI configuration
 
-The two AI endpoints need an Anthropic API key. Set it in the **same terminal session** that starts the app — never put a literal key in source files or properties.
+The two AI endpoints need an Anthropic API key. Set it in the **same terminal session** that starts the app:
 
 ```bash
 # bash / zsh
@@ -196,8 +218,11 @@ src/main/resources/
 ## Running the tests
 
 ```bash
-./mvnw test
+mvnw.cmd test   # Windows
+./mvnw test     # Linux / macOS
 ```
+
+No PostgreSQL or environment variables required. The test classpath (`src/test/resources/application.properties`) replaces the datasource with an H2 in-memory database and disables Flyway — Hibernate generates the schema from entities via `create-drop`.
 
 `PdfRendererSmokeTest` verifies that the renderer produces at least one page and more than 3 KB, catching the zero-content PDF failure mode. `CvGeneratorApplicationTests` verifies the full application context loads (including Spring AI auto-configuration) without an Anthropic key set.
 
