@@ -23,7 +23,9 @@ public class Resume {
     @EqualsAndHashCode.Include
     private Long id;
 
+    @Column(nullable = false)
     private String fullName;
+    @Column(nullable = false)
     private String email;
     private String phone;
     private String location;
