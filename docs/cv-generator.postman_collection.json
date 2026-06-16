@@ -1,0 +1,227 @@
+{
+  "info": {
+    "name": "cv-generator",
+    "description": "REST API for creating, managing, and exporting resumes as PDF.\nBase URL: {{baseUrl}}\n\nWorkflow:\n1. Create a resume (POST /api/resumes) — copy the returned `id` into the `resumeId` variable.\n2. Use the other requests with that id.\n3. Download the PDF (GET /api/resumes/:id/pdf) or preview the HTML (GET /api/resumes/:id/preview).",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080",
+      "type": "string"
+    },
+    {
+      "key": "resumeId",
+      "value": "1",
+      "type": "string",
+      "description": "ID returned by the Create Resume request. Update this after creating a resume."
+    }
+  ],
+  "item": [
+    {
+      "name": "Resume CRUD",
+      "item": [
+        {
+          "name": "List all resumes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes"]
+            }
+          }
+        },
+        {
+          "name": "Get resume by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}"]
+            }
+          }
+        },
+        {
+          "name": "Create resume",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "var json = pm.response.json();",
+                  "if (json && json.id) {",
+                  "    pm.collectionVariables.set('resumeId', json.id);",
+                  "    console.log('resumeId set to', json.id);",
+                  "}"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+1 555 0001\",\n  \"summary\": \"Senior software engineer with 10 years of experience building distributed systems.\",\n  \"workExperiences\": [\n    {\n      \"company\": \"Acme Corp\",\n      \"title\": \"Backend Engineer\",\n      \"startDate\": \"2020-03-01\",\n      \"endDate\": null,\n      \"description\": \"Designed and built high-throughput REST APIs in Java and Spring Boot.\"\n    },\n    {\n      \"company\": \"Startup Inc\",\n      \"title\": \"Junior Developer\",\n      \"startDate\": \"2018-06-01\",\n      \"endDate\": \"2020-02-28\",\n      \"description\": \"Full-stack development with React and Node.js.\"\n    }\n  ],\n  \"educations\": [\n    {\n      \"institution\": \"State University\",\n      \"degree\": \"BSc\",\n      \"fieldOfStudy\": \"Computer Science\",\n      \"startDate\": \"2014-09-01\",\n      \"endDate\": \"2018-06-30\"\n    }\n  ],\n  \"skills\": [\"Java\", \"Spring Boot\", \"PostgreSQL\", \"Docker\", \"Kubernetes\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Update resume",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Jane Doe\",\n  \"email\": \"jane@example.com\",\n  \"phone\": \"+1 555 0001\",\n  \"summary\": \"Updated summary: Principal engineer with 11 years of experience.\",\n  \"workExperiences\": [\n    {\n      \"company\": \"Acme Corp\",\n      \"title\": \"Principal Engineer\",\n      \"startDate\": \"2020-03-01\",\n      \"endDate\": null,\n      \"description\": \"Leading architecture decisions for a platform serving 5M users.\"\n    }\n  ],\n  \"educations\": [\n    {\n      \"institution\": \"State University\",\n      \"degree\": \"BSc\",\n      \"fieldOfStudy\": \"Computer Science\",\n      \"startDate\": \"2014-09-01\",\n      \"endDate\": \"2018-06-30\"\n    }\n  ],\n  \"skills\": [\"Java\", \"Spring Boot\", \"PostgreSQL\", \"Docker\", \"Kubernetes\", \"Kafka\"]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            }
+          }
+        },
+        {
+          "name": "Delete resume",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "PDF Export",
+      "item": [
+        {
+          "name": "Download PDF",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/pdf",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}", "pdf"]
+            },
+            "description": "Returns the resume as a downloadable PDF file (Content-Disposition: attachment).\nPostman will offer to save the file — click Save Response > Save to a file."
+          }
+        },
+        {
+          "name": "Preview HTML",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/{{resumeId}}/preview",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "{{resumeId}}", "preview"]
+            },
+            "description": "Returns the raw HTML that feeds the PDF renderer. Useful for debugging the template."
+          }
+        }
+      ]
+    },
+    {
+      "name": "Validation errors (examples)",
+      "item": [
+        {
+          "name": "Missing required fields",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"\",\n  \"email\": \"not-an-email\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Expects 400 with a `fields` map listing `fullName` and `email` violations."
+          }
+        },
+        {
+          "name": "Invalid date range (end before start)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes"]
+            },
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fullName\": \"Test User\",\n  \"email\": \"test@example.com\",\n  \"workExperiences\": [\n    {\n      \"company\": \"Bad Corp\",\n      \"title\": \"Dev\",\n      \"startDate\": \"2022-01-01\",\n      \"endDate\": \"2020-01-01\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "description": "Expects 400 with a @ValidDateRange violation on workExperiences[0]."
+          }
+        },
+        {
+          "name": "Resume not found",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{baseUrl}}/api/resumes/99999",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "resumes", "99999"]
+            },
+            "description": "Expects 404 with ResourceNotFoundException message."
+          }
+        }
+      ]
+    }
+  ]
+}
