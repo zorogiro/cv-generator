@@ -13,11 +13,12 @@ FRONTEND := frontend
 .DEFAULT_GOAL := help
 
 .PHONY: help \
-        dev backend-run frontend-serve \
-        build backend-build frontend-build frontend-build-prod \
-        install frontend-install \
-        test backend-test \
-        clean backend-clean
+         dev backend-run frontend-serve \
+         build backend-build frontend-build frontend-build-prod \
+         install frontend-install \
+         test backend-test \
+         clean backend-clean \
+         docker-up docker-down docker-logs docker-build
 
 # ── Help ──────────────────────────────────────────────────────────────────────
 help:
@@ -44,10 +45,17 @@ help:
 	@echo "  Clean"
 	@echo "    make clean                mvn clean + rm frontend/dist"
 	@echo ""
+	@echo "  Docker"
+	@echo "    make docker-build         Build all Docker images"
+	@echo "    make docker-up            docker-compose up -d (start all services)"
+	@echo "    make docker-down          docker-compose down -v (stop + remove volumes)"
+	@echo "    make docker-logs          Tail logs from all containers"
+	@echo ""
 	@echo "  Quick links when running:"
 	@echo "    API          http://localhost:8080/api/resumes"
 	@echo "    H2 console   http://localhost:8080/h2-console  (JDBC: jdbc:h2:mem:cvdb  user: sa  pw: <blank>)"
 	@echo "    Angular app  http://localhost:4200"
+	@echo "    pgAdmin      http://localhost:5050 (admin@example.com / admin)"
 	@echo ""
 	@echo "  AI (Claude via Anthropic):"
 	@echo "    export ANTHROPIC_API_KEY=sk-ant-...   # then make backend-run"
@@ -95,3 +103,16 @@ clean: backend-clean
 
 backend-clean:
 	$(MVNW) clean
+
+# ── Docker ────────────────────────────────────────────────────────────────────
+docker-build:
+	docker-compose build
+
+docker-up:
+	docker-compose up -d
+
+docker-down:
+	docker-compose down -v
+
+docker-logs:
+	docker-compose logs -f --tail=50

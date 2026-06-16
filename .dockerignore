@@ -1,0 +1,10 @@
+target
+.idea
+.git
+*.iml
+.docker
+logs
+tmp
+*.log
+Dockerfile*
+docker-compose*
