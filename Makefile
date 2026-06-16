@@ -56,6 +56,8 @@ help:
 	@echo "    H2 console   http://localhost:8080/h2-console  (JDBC: jdbc:h2:mem:cvdb  user: sa  pw: <blank>)"
 	@echo "    Angular app  http://localhost:4200"
 	@echo "    pgAdmin      http://localhost:5050 (admin@example.com / admin)"
+	@echo "    MinIO        http://localhost:9000 (minioadmin / minioadmin)"
+	@echo "    MinIO Console http://localhost:9001"
 	@echo ""
 	@echo "  AI (Claude via Anthropic):"
 	@echo "    export ANTHROPIC_API_KEY=sk-ant-...   # then make backend-run"
