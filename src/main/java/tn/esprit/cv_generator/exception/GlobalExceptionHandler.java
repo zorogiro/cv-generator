@@ -21,9 +21,6 @@ public class GlobalExceptionHandler {
         for (FieldError fe : ex.getBindingResult().getFieldErrors()) {
             fields.put(fe.getField(), fe.getDefaultMessage());
         }
-        // class-level constraints (e.g. @ValidDateRange) appear as global errors
-        ex.getBindingResult().getGlobalErrors().forEach(ge ->
-                fields.put(ge.getObjectName() + ".dateRange", ge.getDefaultMessage()));
         return ResponseEntity.badRequest().body(new ErrorResponse(
                 LocalDateTime.now(), 400, "Validation Failed",
                 "One or more fields failed validation", fields));
